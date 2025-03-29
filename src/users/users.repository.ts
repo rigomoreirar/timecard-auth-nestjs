@@ -6,7 +6,7 @@ import { DatabaseService } from 'src/database/database.service';
 export class UsersRepository {
     constructor(private readonly databaseService: DatabaseService) {}
 
-    async getAllUsers() {
+    async getAll() {
         try {
             return await this.databaseService.user.findMany({
                 where: { isDeleted: false },

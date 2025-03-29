@@ -19,8 +19,8 @@ export class UsersService {
         private readonly rolesRepository: RolesRepository,
     ) {}
 
-    async getAllUsers() {
-        const users = await this.usersRepository.getAllUsers();
+    async getAll() {
+        const users = await this.usersRepository.getAll();
 
         return users;
     }
@@ -29,16 +29,6 @@ export class UsersService {
         const user = await this.validateUserExists(clientId);
 
         return user;
-    }
-
-
-    // Add this to the roles service and controller
-    async getUsersByRoleName(roleName: string) {
-        const role = await this.validateRoleName(roleName);
-
-        const users = await this.usersRepository.getUsersByRoleId(role.id);
-
-        return users;
     }
 
     async login(loginUserDto: LoginUserDto) {

@@ -6,6 +6,7 @@ import {
     Patch,
     Param,
     Delete,
+    ParseIntPipe,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -16,27 +17,35 @@ export class RolesController {
     constructor(private readonly rolesService: RolesService) {}
 
     @Post()
-    create(@Body() createRoleDto: CreateRoleDto) {
-        return this.rolesService.create(createRoleDto);
+    save(@Body() createRoleDto: CreateRoleDto) {
+        return this.rolesService.save(createRoleDto);
     }
 
     @Get()
     findAll() {
-        return this.rolesService.findAll();
+        return this.rolesService.getAll();
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.rolesService.findOne(+id);
+    getRoleById(@Param('id', ParseIntPipe) id: number) {
+        return this.rolesService.getRoleById(id);
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-        return this.rolesService.update(+id, updateRoleDto);
+    update(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updateRoleDto: UpdateRoleDto,
+    ) {
+        return this.rolesService.update(id, updateRoleDto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.rolesService.remove(+id);
+    delete(@Param('id', ParseIntPipe) id: number) {
+        return this.rolesService.delete(id);
+    }
+
+    @Get('/:roleName/users')
+    getUsersByRoleName(@Param('roleName') roleName: string) {
+        return this.rolesService.getUsersByRoleName(roleName);
     }
 }

@@ -6,6 +6,21 @@ import { DatabaseService } from 'src/database/database.service';
 export class RolesRepository {
     constructor(private readonly databaseService: DatabaseService) {}
 
+    async getAll() {
+        try {
+            return await this.databaseService.role.findMany({
+                where: { isDeleted: false },
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new InternalServerErrorException({
+                    message: 'Failed to get all roles',
+                });
+            }
+            throw error;
+        }
+    }
+
     async getRoleById(roleId: number) {
         try {
             return await this.databaseService.role.findFirst({
@@ -38,7 +53,7 @@ export class RolesRepository {
 
     async update(roleId: number, roleUpdateInput: Prisma.RoleUpdateInput) {
         try {
-            return await this.databaseService.user.update({
+            return await this.databaseService.role.update({
                 where: { id: roleId, isDeleted: false },
                 data: roleUpdateInput,
             });

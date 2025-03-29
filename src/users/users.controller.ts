@@ -20,7 +20,7 @@ export class UsersController {
 
     @Get('')
     getAllUsers() {
-        return this.usersService.getAllUsers();
+        return this.usersService.getAll();
     }
 
     @Get('/:clientId')
