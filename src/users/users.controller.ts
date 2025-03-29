@@ -1,42 +1,55 @@
 import {
     Controller,
-    Get,
     Post,
     Body,
     Patch,
-    Param,
     Delete,
+    Get,
+    Param,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
+import { ChangeUserSecretDto } from './dto/change-user-secret.dto';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
-    @Post()
-    create(@Body() createUserDto: CreateUserDto) {
-        return this.usersService.create(createUserDto);
+    @Get('')
+    getAllUsers() {
+        return this.usersService.getAllUsers();
     }
 
-    @Get()
-    findAll() {
-        return this.usersService.findAll();
+    @Get('/:clientId')
+    getUserByClientId(@Param('clientId') clientId: string) {
+        return this.usersService.getUserByClientId(clientId);
     }
 
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.usersService.findOne(+id);
+    @Post('login')
+    login(@Body() loginUserDto: LoginUserDto) {
+        return this.usersService.login(loginUserDto);
     }
 
-    @Patch(':id')
-    update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-        return this.usersService.update(+id, updateUserDto);
+    @Post('login')
+    register(@Body() registerUserDto: RegisterUserDto) {
+        return this.usersService.register(registerUserDto);
     }
 
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.usersService.remove(+id);
+    @Patch('/change-secret')
+    changeSecret(@Body() changeUserSecretDto: ChangeUserSecretDto) {
+        return this.usersService.changeSecret(changeUserSecretDto);
+    }
+
+    @Patch('')
+    update(@Body() updateUserDto: UpdateUserDto) {
+        return this.usersService.update(updateUserDto);
+    }
+
+    @Delete('')
+    delete(@Body() deleteUserDto: DeleteUserDto) {
+        return this.usersService.delete(deleteUserDto);
     }
 }

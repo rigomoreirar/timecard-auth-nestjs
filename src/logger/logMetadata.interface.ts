@@ -1,8 +1,17 @@
 export interface LogMetadata {
-    traceId: string; // e.g. "1f94f1c7-c65f-4f54-82a2-78db685f12ed"
-    message: string; // e.g. "Database error in getById"
-    method: string; // e.g. "TimecardsRepository.getById"
-    optionalParameter?: string; // or string, depending on your usage
-    errorMessage?: string; // e.g. error.message
-    stack?: string; // e.g. error.stack
+    traceId: string;
+    method?: string;
+    errorMessage?: string;
+    stack?: string;
+    statusCode?: number;
+    errorName?: string;
+    timestamp?: string;
+    level?: string;
+    url?: string;
+    originalUrl?: string;
+    ip?: string;
+    query?: Record<string, any>;
+    body?: Record<string, any>;
+    headers?: Record<string, string | string[]>;
+    userAgent?: string;
 }
