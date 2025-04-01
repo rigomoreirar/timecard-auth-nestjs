@@ -69,7 +69,7 @@ export class RolesRepository {
 
     async delete(roleId: number) {
         try {
-            return await this.databaseService.user.update({
+            return await this.databaseService.role.update({
                 where: { id: roleId, isDeleted: false },
                 data: { isDeleted: true },
             });

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 
 import { UsersRepository } from './users.repository';
@@ -42,7 +42,7 @@ export class UsersService {
             });
         }
         const match = await bcrypt.compare(
-            loginUserDto.clientSecret,
+            loginUserDto.password,
             user.passwordHash,
         );
 
@@ -189,7 +189,9 @@ export class UsersService {
     }
 
     async generateNewPasswordHash(password: string) {
-        const saltRounds = this.config.get<number>('BCRYPT_SALT_ROUNDS') || 10;
+        const saltRoundsStr = this.config.get<string>('BCRYPT_SALT_ROUNDS');
+
+        const saltRounds = saltRoundsStr ? parseInt(saltRoundsStr, 10) : 10;
 
         return await bcrypt.hash(password, saltRounds);
     }

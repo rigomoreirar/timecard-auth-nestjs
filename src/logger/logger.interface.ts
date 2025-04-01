@@ -14,4 +14,6 @@ export interface LogMetadata {
     body?: Record<string, any>;
     headers?: Record<string, string | string[]>;
     userAgent?: string;
+    requestBody: Record<string, any>;
+    responseBody: Record<string, any>;
 }

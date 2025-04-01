@@ -28,17 +28,17 @@ export class UsersController {
         return this.usersService.getUserByClientId(clientId);
     }
 
-    @Post('login')
+    @Post('/login')
     login(@Body() loginUserDto: LoginUserDto) {
         return this.usersService.login(loginUserDto);
     }
 
-    @Post('login')
+    @Post('/register')
     register(@Body() registerUserDto: RegisterUserDto) {
         return this.usersService.register(registerUserDto);
     }
 
-    @Patch('/change-secret')
+    @Patch('/change-password')
     changeSecret(@Body() changeUserSecretDto: ChangeUserSecretDto) {
         return this.usersService.changeSecret(changeUserSecretDto);
     }

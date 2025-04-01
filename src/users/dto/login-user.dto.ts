@@ -7,5 +7,5 @@ export class LoginUserDto {
 
     @IsString({ message: 'Client secret must be a string' })
     @IsNotEmpty({ message: 'Client secret is required' })
-    clientSecret: string;
+    password: string;
 }

@@ -15,7 +15,7 @@ export class RolesService {
     ) {}
 
     async save(createRoleDto: CreateRoleDto) {
-        const roleExists = await this.usersService.validateRoleName(
+        const roleExists = await this.rolesRepository.getRoleByName(
             createRoleDto.name,
         );
 
