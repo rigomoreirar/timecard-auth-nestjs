@@ -58,3 +58,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # logs and uncaught-exception dumps
 /api-logs
 /api-uncaught-exceptions
+
+# Keys for RS256
+/keys

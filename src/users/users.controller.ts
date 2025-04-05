@@ -6,6 +6,7 @@ import {
     Delete,
     Get,
     Param,
+    UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -13,12 +14,15 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import { ChangeUserSecretDto } from './dto/change-user-secret.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { AdminRoleGuard } from 'src/auth/guards/admin-role.guard';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Get('')
+    @UseGuards(AuthGuard('jwt'), AdminRoleGuard)
     getAllUsers() {
         return this.usersService.getAll();
     }

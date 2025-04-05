@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 
+import { RefreshTokensRepository } from 'src/refresh-tokens/refresh-tokens.repository';
 import { UsersRepository } from './users.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -10,6 +12,8 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import { ChangeUserSecretDto } from './dto/change-user-secret.dto';
 import { RolesRepository } from 'src/roles/roles.repository';
+import { AuthService } from 'src/auth/auth.service';
+import { User as AuthUserInterface } from 'src/auth/auth.interface';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +21,8 @@ export class UsersService {
         private readonly usersRepository: UsersRepository,
         private config: ConfigService,
         private readonly rolesRepository: RolesRepository,
+        private readonly authService: AuthService,
+        private readonly refreshTokensRepository: RefreshTokensRepository,
     ) {}
 
     async getAll() {
@@ -61,8 +67,40 @@ export class UsersService {
                 });
             }
 
+            const authUser: AuthUserInterface = {
+                id: user.id.toString(),
+                role: roleName.name,
+                clientId: user.clientId,
+            };
+
+            const token = this.authService.signAccessToken(authUser);
+
+            let currentRefreshToken =
+                await this.refreshTokensRepository.getByUserId(user.id);
+
+            if (
+                !currentRefreshToken ||
+                currentRefreshToken.length === 0 ||
+                !currentRefreshToken[0].isActive
+            ) {
+                const refreshToken: Prisma.RefreshTokenCreateInput = {
+                    token: randomBytes(32).toString('hex'),
+                    user: {
+                        connect: { id: user.id },
+                    },
+                    isActive: true,
+                    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+                };
+
+                currentRefreshToken = [
+                    await this.refreshTokensRepository.save(refreshToken),
+                ];
+            }
+
             return {
                 message: 'User logged in successfully',
+                refreshToken: currentRefreshToken[0].token,
+                token: token,
                 user: {
                     clientId: user.clientId,
                     email: user.email,

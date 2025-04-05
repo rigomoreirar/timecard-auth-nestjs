@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { LoggerModule } from './logger/logger.module';
 import { RolesModule } from './roles/roles.module';
 import { DatabaseModule } from './database/database.module';
+import { RefreshTokensModule } from './refresh-tokens/refresh-tokens.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { DatabaseModule } from './database/database.module';
         UsersModule,
         RolesModule,
         DatabaseModule,
+        RefreshTokensModule,
     ],
     controllers: [AppController],
     providers: [AppService],
