@@ -13,6 +13,17 @@ export class AuthService {
             clientId: user.clientId,
         };
 
-        return this.jwtService.sign(payload);
+        let expiresIn = '15m';
+
+        if (user.role === 'api') {
+            expiresIn = '24h';
+        } else if (user.role === 'webapp') {
+            expiresIn = '8h';
+        }
+
+        return this.jwtService.sign(payload, {
+            algorithm: 'RS256',
+            expiresIn,
+        });
     }
 }

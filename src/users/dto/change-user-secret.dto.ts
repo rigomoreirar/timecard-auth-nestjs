@@ -14,8 +14,4 @@ export class ChangeUserSecretDto {
     @IsString({ message: 'Client new password must be a string' })
     @IsNotEmpty({ message: 'Client new password is required' })
     newPassword: string;
-
-    // @IsString({ message: 'Admin password must be a string' })
-    // @IsNotEmpty({ message: 'Admin password is required' })
-    // adminPassword: string;
 }

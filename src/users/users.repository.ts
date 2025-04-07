@@ -53,6 +53,21 @@ export class UsersRepository {
         }
     }
 
+    async getUserById(id: number) {
+        try {
+            return await this.databaseService.user.findFirst({
+                where: { id, isDeleted: false },
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new InternalServerErrorException({
+                    message: 'Failed to get user by ID',
+                });
+            }
+            throw error;
+        }
+    }
+
     async save(userCreateInput: Prisma.UserCreateInput) {
         try {
             return await this.databaseService.user.create({

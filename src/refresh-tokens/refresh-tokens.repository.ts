@@ -86,4 +86,37 @@ export class RefreshTokensRepository {
             throw error;
         }
     }
+
+    async getByToken(token: string) {
+        try {
+            return await this.databaseService.refreshToken.findUnique({
+                where: { token: token },
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new InternalServerErrorException({
+                    message: 'Failed to get refresh token by token',
+                });
+            }
+
+            throw error;
+        }
+    }
+
+    async updateExpiresAt(id: number, expiresAt: Date) {
+        try {
+            return await this.databaseService.refreshToken.update({
+                where: { id },
+                data: { expiresAt },
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new InternalServerErrorException({
+                    message: 'Failed to update refresh token expiration date',
+                });
+            }
+
+            throw error;
+        }
+    }
 }

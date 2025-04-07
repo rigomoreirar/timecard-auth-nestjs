@@ -1,5 +1,14 @@
-import { Controller, Get, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Param,
+    Body,
+    Delete,
+    ParseIntPipe,
+} from '@nestjs/common';
 import { RefreshTokensService } from './refresh-tokens.service';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('refresh-tokens')
 export class RefreshTokensController {
@@ -13,5 +22,10 @@ export class RefreshTokensController {
     @Delete(':id')
     delete(@Param('id', ParseIntPipe) id: number) {
         return this.refreshTokensService.delete(id);
+    }
+
+    @Post('')
+    refreshToken(@Body('') refreshTokenDto: RefreshTokenDto) {
+        return this.refreshTokensService.refreshToken(refreshTokenDto);
     }
 }

@@ -1,11 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, NotFoundException } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import * as fs from 'fs';
 import * as path from 'path';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthService } from './auth.service';
-import { AdminRoleGuard } from './guards/admin-role.guard';
 
 @Module({
     imports: [
@@ -26,7 +25,7 @@ import { AdminRoleGuard } from './guards/admin-role.guard';
                     !fs.existsSync(privateKeyPath) ||
                     !fs.existsSync(publicKeyPath)
                 ) {
-                    throw new Error(
+                    throw new NotFoundException(
                         'Private or public key file is missing. Ensure /keys/private.key and /keys/public.key exist.',
                     );
                 }
@@ -40,13 +39,14 @@ import { AdminRoleGuard } from './guards/admin-role.guard';
                     signOptions: {
                         algorithm: 'RS256',
                         expiresIn:
-                            configService.get<string>('JWT_EXPIRES_IN') || '1h',
+                            configService.get<string>('JWT_EXPIRES_IN') ||
+                            '10m',
                     },
                 };
             },
         }),
     ],
     providers: [AuthService, JwtStrategy],
-    exports: [AuthService, AdminRoleGuard],
+    exports: [AuthService],
 })
 export class AuthModule {}

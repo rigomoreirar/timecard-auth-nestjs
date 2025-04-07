@@ -7,7 +7,9 @@ import {
     Get,
     Param,
     UseGuards,
+    Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -28,31 +30,39 @@ export class UsersController {
     }
 
     @Get('/:clientId')
+    @UseGuards(AuthGuard('jwt'), AdminRoleGuard)
     getUserByClientId(@Param('clientId') clientId: string) {
         return this.usersService.getUserByClientId(clientId);
     }
 
     @Post('/login')
-    login(@Body() loginUserDto: LoginUserDto) {
-        return this.usersService.login(loginUserDto);
+    login(
+        @Body() loginUserDto: LoginUserDto,
+        @Res({ passthrough: true }) response: Response,
+    ) {
+        return this.usersService.login(loginUserDto, response);
     }
 
     @Post('/register')
+    @UseGuards(AuthGuard('jwt'), AdminRoleGuard)
     register(@Body() registerUserDto: RegisterUserDto) {
         return this.usersService.register(registerUserDto);
     }
 
     @Patch('/change-password')
+    @UseGuards(AuthGuard('jwt'), AdminRoleGuard)
     changeSecret(@Body() changeUserSecretDto: ChangeUserSecretDto) {
         return this.usersService.changeSecret(changeUserSecretDto);
     }
 
     @Patch('')
+    @UseGuards(AuthGuard('jwt'), AdminRoleGuard)
     update(@Body() updateUserDto: UpdateUserDto) {
         return this.usersService.update(updateUserDto);
     }
 
     @Delete('')
+    @UseGuards(AuthGuard('jwt'), AdminRoleGuard)
     delete(@Body() deleteUserDto: DeleteUserDto) {
         return this.usersService.delete(deleteUserDto);
     }

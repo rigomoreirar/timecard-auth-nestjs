@@ -3,11 +3,14 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AppLogger } from './logger/app.logger';
 import { LoggerExceptionFilter } from './logger/logger.filter';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, { logger: false });
     // const app = await NestFactory.create(AppModule);
     const logger = app.get(AppLogger);
+
+    app.use(cookieParser());
 
     app.useLogger(logger);
 

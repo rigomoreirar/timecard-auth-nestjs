@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { ConfigService } from '@nestjs/config';
@@ -37,7 +38,7 @@ export class UsersService {
         return user;
     }
 
-    async login(loginUserDto: LoginUserDto) {
+    async login(loginUserDto: LoginUserDto, response: Response) {
         const user = await this.usersRepository.getUserByClientId(
             loginUserDto.clientId,
         );
@@ -96,6 +97,13 @@ export class UsersService {
                     await this.refreshTokensRepository.save(refreshToken),
                 ];
             }
+
+            response.cookie('refreshToken', currentRefreshToken[0].token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict',
+                maxAge: currentRefreshToken[0].expiresAt.getTime() - Date.now(),
+            });
 
             return {
                 message: 'User logged in successfully',
