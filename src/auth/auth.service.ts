@@ -13,12 +13,12 @@ export class AuthService {
             clientId: user.clientId,
         };
 
-        let expiresIn = '15m';
+        let expiresIn = '3m';
 
         if (user.role === 'api') {
-            expiresIn = '24h';
+            expiresIn = '12h';
         } else if (user.role === 'webapp') {
-            expiresIn = '8h';
+            expiresIn = '5m';
         }
 
         return this.jwtService.sign(payload, {

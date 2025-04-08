@@ -39,8 +39,7 @@ import { AuthService } from './auth.service';
                     signOptions: {
                         algorithm: 'RS256',
                         expiresIn:
-                            configService.get<string>('JWT_EXPIRES_IN') ||
-                            '10m',
+                            configService.get<string>('JWT_EXPIRES_IN') || '3m',
                     },
                 };
             },
