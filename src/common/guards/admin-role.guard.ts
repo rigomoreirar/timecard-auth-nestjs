@@ -4,7 +4,7 @@ import {
     ExecutionContext,
     ForbiddenException,
 } from '@nestjs/common';
-import { JwtPayload } from '../auth.interface';
+import { JwtPayload } from '../../auth/auth.interface';
 import { Request } from 'express';
 
 @Injectable()
