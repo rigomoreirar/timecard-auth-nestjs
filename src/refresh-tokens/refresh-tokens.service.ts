@@ -3,7 +3,7 @@ import { RefreshTokensRepository } from './refresh-tokens.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { RolesRepository } from 'src/roles/roles.repository';
 import { AuthService } from 'src/auth/auth.service';
-import { User as AuthUserInterface } from 'src/auth/auth.interface';
+import { JwtPayload } from 'src/auth/auth.interface';
 
 @Injectable()
 export class RefreshTokensService {
@@ -67,8 +67,8 @@ export class RefreshTokensService {
             });
         }
 
-        const authUser: AuthUserInterface = {
-            id: user.id.toString(),
+        const authUser: JwtPayload = {
+            userId: user.id,
             role: roleName.name,
             clientId: user.clientId,
         };

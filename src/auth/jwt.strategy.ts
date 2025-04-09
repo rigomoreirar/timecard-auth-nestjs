@@ -3,11 +3,10 @@ import {
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { User, JwtPayload } from './auth.interface';
+import { JwtPayload } from './auth.interface';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -15,15 +14,7 @@ import * as path from 'path';
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     constructor(private configService: ConfigService) {
         super({
-            jwtFromRequest: (req: Request) => {
-                // 1) Check if there's a cookie named "access_token"
-                if (req.cookies?.access_token) {
-                    return req.cookies.access_token as string;
-                }
-
-                // 2) Otherwise fall back to Authorization header
-                return ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-            },
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
             secretOrKey: (() => {
                 const publicKeyPath = path.resolve(
@@ -43,17 +34,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         });
     }
 
-    validate(payload: JwtPayload): User {
-        if (!payload.sub || !payload.role || !payload.clientId) {
+    validate(payload: JwtPayload): JwtPayload {
+        if (!payload.userId || !payload.role || !payload.clientId) {
             throw new BadRequestException('Invalid JWT payload');
         }
 
-        const user: User = {
-            id: payload.sub,
-            role: payload.role,
-            clientId: payload.clientId,
-        };
-
-        return user;
+        return payload;
     }
 }

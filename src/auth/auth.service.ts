@@ -1,18 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from './auth.interface';
+import { JwtPayload } from './auth.interface';
 
 @Injectable()
 export class AuthService {
     constructor(private readonly jwtService: JwtService) {}
 
-    signAccessToken(user: User): string {
-        const payload = {
-            sub: user.id,
-            role: user.role,
-            clientId: user.clientId,
-        };
-
+    signAccessToken(user: JwtPayload): string {
         let expiresIn = '3m';
 
         if (user.role === 'api') {
@@ -21,7 +15,7 @@ export class AuthService {
             expiresIn = '5m';
         }
 
-        return this.jwtService.sign(payload, {
+        return this.jwtService.sign(user, {
             algorithm: 'RS256',
             expiresIn,
         });

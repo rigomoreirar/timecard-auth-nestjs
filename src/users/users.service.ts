@@ -14,7 +14,7 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { ChangeUserSecretDto } from './dto/change-user-secret.dto';
 import { RolesRepository } from 'src/roles/roles.repository';
 import { AuthService } from 'src/auth/auth.service';
-import { User as AuthUserInterface } from 'src/auth/auth.interface';
+import { JwtPayload } from 'src/auth/auth.interface';
 
 @Injectable()
 export class UsersService {
@@ -68,8 +68,8 @@ export class UsersService {
                 });
             }
 
-            const authUser: AuthUserInterface = {
-                id: user.id.toString(),
+            const authUser: JwtPayload = {
+                userId: user.id,
                 role: roleName.name,
                 clientId: user.clientId,
             };
@@ -104,6 +104,18 @@ export class UsersService {
                 sameSite: 'strict',
                 maxAge: currentRefreshToken[0].expiresAt.getTime() - Date.now(),
             });
+
+            if (roleName.name === 'webapp') {
+                return {
+                    message: 'User logged in successfully',
+                    token: token,
+                    user: {
+                        clientId: user.clientId,
+                        email: user.email,
+                        role: roleName.name,
+                    },
+                };
+            }
 
             return {
                 message: 'User logged in successfully',
