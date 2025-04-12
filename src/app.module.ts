@@ -8,6 +8,8 @@ import { LoggerModule } from './logger/logger.module';
 import { RolesModule } from './roles/roles.module';
 import { DatabaseModule } from './database/database.module';
 import { RefreshTokensModule } from './refresh-tokens/refresh-tokens.module';
+import { ValidationModule } from './validation/validation.module';
+import { RepositoriesModule } from './repositories/repositories.module';
 
 @Module({
     imports: [
@@ -20,6 +22,8 @@ import { RefreshTokensModule } from './refresh-tokens/refresh-tokens.module';
         RolesModule,
         DatabaseModule,
         RefreshTokensModule,
+        ValidationModule,
+        RepositoriesModule,
     ],
     controllers: [AppController],
     providers: [AppService],

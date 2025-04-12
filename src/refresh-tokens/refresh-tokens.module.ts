@@ -1,23 +1,13 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { AuthModule } from 'src/auth/auth.module';
-import { DatabaseModule } from 'src/database/database.module';
-import { LoggerModule } from 'src/logger/logger.module';
+import { Module } from '@nestjs/common';
 import { RefreshTokensService } from './refresh-tokens.service';
 import { RefreshTokensController } from './refresh-tokens.controller';
-import { RefreshTokensRepository } from './refresh-tokens.repository';
-import { UsersModule } from 'src/users/users.module';
-import { RolesModule } from 'src/roles/roles.module';
+import { RepositoriesModule } from 'src/repositories/repositories.module';
+import { ValidationModule } from 'src/validation/validation.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-    imports: [
-        DatabaseModule,
-        LoggerModule,
-        AuthModule,
-        forwardRef(() => UsersModule),
-        RolesModule,
-    ],
+    imports: [ValidationModule, RepositoriesModule, AuthModule],
     controllers: [RefreshTokensController],
-    providers: [RefreshTokensService, RefreshTokensRepository],
-    exports: [RefreshTokensRepository],
+    providers: [RefreshTokensService],
 })
 export class RefreshTokensModule {}

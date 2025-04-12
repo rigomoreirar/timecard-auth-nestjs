@@ -2,16 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { RolesRepository } from './roles.repository';
-import { UsersRepository } from 'src/users/users.repository';
-import { UsersService } from 'src/users/users.service';
+import { RolesRepository } from '../repositories/roles.repository';
+import { UsersRepository } from 'src/repositories/users.repository';
+import { ValidationService } from 'src/validation/validation.service';
 
 @Injectable()
 export class RolesService {
     constructor(
         private readonly rolesRepository: RolesRepository,
         private readonly usersRepository: UsersRepository,
-        private readonly usersService: UsersService,
+        private readonly validationService: ValidationService,
     ) {}
 
     async save(createRoleDto: CreateRoleDto) {
@@ -44,13 +44,13 @@ export class RolesService {
     }
 
     async getRoleById(roleId: number) {
-        const role = await this.validateRoleId(roleId);
+        const role = await this.validationService.validateRoleId(roleId);
 
         return role;
     }
 
     async update(roleId: number, updateRoleDto: UpdateRoleDto) {
-        await this.validateRoleId(roleId);
+        await this.validationService.validateRoleId(roleId);
 
         const updatedRole: Prisma.RoleUpdateInput = {
             ...updateRoleDto,
@@ -65,7 +65,7 @@ export class RolesService {
     }
 
     async delete(roleId: number) {
-        await this.validateRoleId(roleId);
+        await this.validationService.validateRoleId(roleId);
 
         await this.rolesRepository.delete(roleId);
 
@@ -75,22 +75,10 @@ export class RolesService {
     }
 
     async getUsersByRoleName(roleName: string) {
-        const role = await this.usersService.validateRoleName(roleName);
+        const role = await this.validationService.validateRoleName(roleName);
 
         const users = await this.usersRepository.getUsersByRoleId(role.id);
 
         return users;
-    }
-
-    async validateRoleId(roleId: number) {
-        const role = await this.rolesRepository.getRoleById(roleId);
-
-        if (!role) {
-            throw new NotFoundException({
-                message: 'Role does not exist',
-            });
-        } else {
-            return role;
-        }
     }
 }

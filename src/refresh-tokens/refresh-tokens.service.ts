@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { RefreshTokensRepository } from './refresh-tokens.repository';
-import { UsersRepository } from 'src/users/users.repository';
-import { RolesRepository } from 'src/roles/roles.repository';
+import { RefreshTokensRepository } from '../repositories/refresh-tokens.repository';
+import { UsersRepository } from 'src/repositories/users.repository';
+import { RolesRepository } from 'src/repositories/roles.repository';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtPayload } from 'src/auth/auth.interface';
+import { ValidationService } from 'src/validation/validation.service';
 
 @Injectable()
 export class RefreshTokensService {
@@ -12,6 +13,7 @@ export class RefreshTokensService {
         private readonly usersRepository: UsersRepository,
         private readonly authService: AuthService,
         private readonly rolesRepository: RolesRepository,
+        private readonly validationService: ValidationService,
     ) {}
 
     async getAll() {
@@ -21,7 +23,8 @@ export class RefreshTokensService {
     }
 
     async delete(id: number) {
-        const refreshToken = await this.validateRefreshTokenId(id);
+        const refreshToken =
+            await this.validationService.validateRefreshTokenId(id);
 
         return {
             message: 'Refresh token deleted successfully',
@@ -80,16 +83,5 @@ export class RefreshTokensService {
             refreshToken: refreshToken.token,
             token: token,
         };
-    }
-
-    async validateRefreshTokenId(refreshTokenId: number) {
-        const refreshToken =
-            await this.refreshTokensRepository.getById(refreshTokenId);
-
-        if (!refreshToken) {
-            throw new NotFoundException('Refresh token not found');
-        }
-
-        return refreshToken;
     }
 }

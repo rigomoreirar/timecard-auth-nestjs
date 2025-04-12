@@ -5,14 +5,15 @@ import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 
-import { RefreshTokensRepository } from 'src/refresh-tokens/refresh-tokens.repository';
-import { UsersRepository } from './users.repository';
+import { RefreshTokensRepository } from 'src/repositories/refresh-tokens.repository';
+import { ValidationService } from 'src/validation/validation.service';
+import { UsersRepository } from '../repositories/users.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import { ChangeUserSecretDto } from './dto/change-user-secret.dto';
-import { RolesRepository } from 'src/roles/roles.repository';
+import { RolesRepository } from 'src/repositories/roles.repository';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtPayload } from 'src/auth/auth.interface';
 
@@ -24,6 +25,7 @@ export class UsersService {
         private readonly rolesRepository: RolesRepository,
         private readonly authService: AuthService,
         private readonly refreshTokensRepository: RefreshTokensRepository,
+        private readonly validationService: ValidationService,
     ) {}
 
     async getAll() {
@@ -33,7 +35,7 @@ export class UsersService {
     }
 
     async getUserByClientId(clientId: string) {
-        const user = await this.validateUserExists(clientId);
+        const user = await this.validationService.validateUserExists(clientId);
 
         return user;
     }
@@ -135,7 +137,9 @@ export class UsersService {
             registerUserDto.password,
         );
 
-        const role = await this.validateRoleName(registerUserDto.roleName);
+        const role = await this.validationService.validateRoleName(
+            registerUserDto.roleName,
+        );
 
         const newUser: Prisma.UserCreateInput = {
             clientId: registerUserDto.clientId,
@@ -157,7 +161,7 @@ export class UsersService {
     }
 
     async changeSecret(changeUserSecretDto: ChangeUserSecretDto) {
-        const user = await this.validateUserPassword(
+        const user = await this.validationService.validateUserPassword(
             changeUserSecretDto.clientId,
             changeUserSecretDto.oldPassword,
         );
@@ -185,9 +189,13 @@ export class UsersService {
     }
 
     async update(updateUserDto: UpdateUserDto) {
-        const user = await this.validateUserExists(updateUserDto.clientId);
+        const user = await this.validationService.validateUserExists(
+            updateUserDto.clientId,
+        );
 
-        const role = await this.validateRoleName(updateUserDto.roleName);
+        const role = await this.validationService.validateRoleName(
+            updateUserDto.roleName,
+        );
 
         const updatedUser: Prisma.UserUpdateInput = {
             email: updateUserDto.email,
@@ -208,7 +216,9 @@ export class UsersService {
     }
 
     async delete(deleteUserDto: DeleteUserDto) {
-        const user = await this.validateUserExists(deleteUserDto.clientId);
+        const user = await this.validationService.validateUserExists(
+            deleteUserDto.clientId,
+        );
 
         await this.usersRepository.delete(user.clientId);
 
@@ -220,49 +230,11 @@ export class UsersService {
         };
     }
 
-    async validateUserExists(clientId: string) {
-        const user = await this.usersRepository.getUserByClientId(clientId);
-
-        if (!user) {
-            throw new NotFoundException({
-                message: 'User does not exist',
-            });
-        } else {
-            return user;
-        }
-    }
-
-    async validateUserPassword(clientId: string, password: string) {
-        const user = await this.validateUserExists(clientId);
-
-        const match = await bcrypt.compare(password, user.passwordHash);
-
-        if (!match) {
-            throw new NotFoundException({
-                message: 'Incorrect password',
-            });
-        } else {
-            return user;
-        }
-    }
-
     async generateNewPasswordHash(password: string) {
         const saltRoundsStr = this.config.get<string>('BCRYPT_SALT_ROUNDS');
 
         const saltRounds = saltRoundsStr ? parseInt(saltRoundsStr, 10) : 10;
 
         return await bcrypt.hash(password, saltRounds);
-    }
-
-    async validateRoleName(roleName: string) {
-        const role = await this.rolesRepository.getRoleByName(roleName);
-
-        if (!role) {
-            throw new NotFoundException({
-                message: 'Role does not exist',
-            });
-        } else {
-            return role;
-        }
     }
 }

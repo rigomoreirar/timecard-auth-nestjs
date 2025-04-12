@@ -4,15 +4,15 @@ import {
     ExecutionContext,
     ForbiddenException,
 } from '@nestjs/common';
-import { JwtPayload } from '../../auth/auth.interface';
+import { JwtResponse } from '../../auth/auth.interface';
 import { Request } from 'express';
 
 @Injectable()
 export class AdminRoleGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean {
-        const userAuthPayload: Request = context.switchToHttp().getRequest();
+        const AuthTokenContent: Request = context.switchToHttp().getRequest();
 
-        const user: JwtPayload = userAuthPayload.user as JwtPayload;
+        const user: JwtResponse = AuthTokenContent.user as JwtResponse;
 
         if (!user) {
             throw new ForbiddenException('No user in request');

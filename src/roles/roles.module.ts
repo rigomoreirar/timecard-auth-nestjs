@@ -1,15 +1,13 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { RolesController } from './roles.controller';
-import { RolesRepository } from './roles.repository';
-import { DatabaseModule } from 'src/database/database.module';
-import { LoggerModule } from 'src/logger/logger.module';
-import { UsersModule } from 'src/users/users.module';
+import { RepositoriesModule } from 'src/repositories/repositories.module';
+import { ValidationModule } from 'src/validation/validation.module';
 
 @Module({
-    imports: [DatabaseModule, LoggerModule, forwardRef(() => UsersModule)],
-    exports: [RolesService, RolesRepository],
+    imports: [ValidationModule, RepositoriesModule],
+    exports: [RolesService],
     controllers: [RolesController],
-    providers: [RolesService, RolesRepository],
+    providers: [RolesService],
 })
 export class RolesModule {}
