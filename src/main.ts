@@ -6,8 +6,10 @@ import { LoggerExceptionFilter } from './logger/logger.filter';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule, { logger: false });
-    // const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+        logger: new AppLogger(),
+    });
+
     const logger = app.get(AppLogger);
 
     app.use(cookieParser());

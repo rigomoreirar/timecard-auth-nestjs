@@ -1,64 +1,77 @@
-import { Injectable, LoggerService as NestLoggerService } from '@nestjs/common';
+import {
+    Injectable,
+    LoggerService as NestLoggerService,
+    LogLevel,
+} from '@nestjs/common';
 import { createLogger, format, transports, Logger } from 'winston';
 import { LogMetadata } from './logger.interface';
-import * as fs from 'fs';
-import * as path from 'path';
+
+type MessageOrMeta = string | LogMetadata;
 
 @Injectable()
 export class LoggerService implements NestLoggerService {
-    private logger: Logger;
+    private readonly logger: Logger;
 
     constructor() {
-        const logDir = path.resolve(__dirname, '../../api-logs');
-        const exceptionDir = path.resolve(
-            __dirname,
-            '../../api-uncaught-exceptions',
-        );
-
-        if (!fs.existsSync(logDir)) {
-            fs.mkdirSync(logDir, { recursive: true });
-        }
-
-        if (!fs.existsSync(exceptionDir)) {
-            fs.mkdirSync(exceptionDir, { recursive: true });
-        }
-
-        const logFileName = path.join(logDir, `app-logger.log`);
-        const exceptionFileName = path.join(
-            exceptionDir,
-            `uncaught-exceptions.log`,
-        );
-
         this.logger = createLogger({
             level: 'info',
             format: format.combine(format.timestamp(), format.json()),
             transports: [
                 new transports.Console(),
-                new transports.File({ filename: logFileName }),
+                new transports.File({ filename: 'api-logs/app-logger.log' }),
             ],
             exceptionHandlers: [
-                new transports.File({ filename: exceptionFileName }),
+                new transports.File({
+                    filename: 'api-uncaught-exceptions/exceptions.log',
+                }),
             ],
         });
     }
 
-    log(message: LogMetadata) {
-        this.logger.info(message);
+    log(message: MessageOrMeta, context?: string) {
+        if (typeof message === 'string') {
+            this.logger.info(message, { context });
+        } else {
+            // structured metadata
+            this.logger.info('request', message);
+        }
     }
 
-    error(message: LogMetadata) {
-        this.logger.error(message);
+    error(message: MessageOrMeta, trace?: string, context?: string) {
+        if (typeof message === 'string') {
+            this.logger.error(message, { trace, context });
+        } else {
+            this.logger.error('exception', { ...message, trace });
+        }
     }
 
-    warn(message: LogMetadata) {
-        this.logger.warn(message);
+    warn(message: MessageOrMeta, context?: string) {
+        if (typeof message === 'string') {
+            this.logger.warn(message, { context });
+        } else {
+            this.logger.warn('warning', message);
+        }
     }
 
-    debug?(message: LogMetadata) {
-        this.logger.debug(message);
+    debug?(message: MessageOrMeta, context?: string) {
+        if (typeof message === 'string') {
+            this.logger.debug(message, { context });
+        } else {
+            this.logger.debug('debug', message);
+        }
     }
 
-    verbose?(message: LogMetadata) {
-        this.logger.verbose(message);
+    verbose?(message: MessageOrMeta, context?: string) {
+        if (typeof message === 'string') {
+            this.logger.verbose(message, { context });
+        } else {
+            this.logger.verbose('verbose', message);
+        }
+    }
+
+    setLogLevels?(levels: LogLevel[]) {
+        if (levels.length) {
+            this.logger.level = levels[0];
+        }
     }
 }
